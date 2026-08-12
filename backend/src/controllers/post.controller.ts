@@ -55,14 +55,20 @@ export const createPost = async (req: Request, res: Response) => {
   }
 };
 
-export const getMyPosts = async (req: Request, res: Response) => {
+export const getMyPosts = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const posts = await Post.find({
       owner: req.userId,
+      status: { $ne: "archived" },
     })
-      .populate("owner", "name username profilePicture")
+      .populate(
+        "owner",
+        "name username profilePicture"
+      )
       .sort({ createdAt: -1 });
-    console.log("User ID:", req.userId);
 
     return res.status(200).json({
       success: true,
@@ -78,14 +84,21 @@ export const getMyPosts = async (req: Request, res: Response) => {
     });
   }
 };
-export const getUserPosts = async (req: Request, res: Response) => {
+export const getUserPosts = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const { userId } = req.params;
 
     const posts = await Post.find({
-      owner: userId, 
+      owner: userId,
+      status: { $ne: "archived" },
     })
-      .populate("owner", "name username profilePicture")
+      .populate(
+        "owner",
+        "name username profilePicture"
+      )
       .sort({ createdAt: -1 });
 
     return res.status(200).json({
@@ -160,9 +173,7 @@ export const updatePost = async (req: Request, res: Response) => {
       post.caption = caption;
     }
 
-    
     if (files && files.length > 0) {
-      
       for (const image of post.images) {
         await deleteFromCloudinary(image.publicId);
       }
@@ -296,6 +307,120 @@ export const likeUnlikePost = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       message: "Post liked successfully.",
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+export const archivePost = async (req: Request, res: Response) => {
+  try {
+    const { postId } = req.params;
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found.",
+      });
+    }
+
+    if (post.owner.toString() !== req.userId) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to archive this post.",
+      });
+    }
+
+    if (post.status === "archived") {
+      return res.status(400).json({
+        success: false,
+        message: "Post is already archived.",
+      });
+    }
+
+    post.status = "archived";
+
+    await post.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Post archived successfully.",
+      post,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const unarchivePost = async (req: Request, res: Response) => {
+  try {
+    const { postId } = req.params;
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found.",
+      });
+    }
+
+    if (post.owner.toString() !== req.userId) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to unarchive this post.",
+      });
+    }
+
+    if (post.status === "active") {
+      return res.status(400).json({
+        success: false,
+        message: "Post is already active.",
+      });
+    }
+
+    post.status = "active";
+
+    await post.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Post unarchived successfully.",
+      post,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+export const getArchivedPosts = async (req: Request, res: Response) => {
+  try {
+    const posts = await Post.find({
+      owner: req.userId,
+      status: "archived",
+    })
+      .populate("owner", "name username profilePicture")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      totalPosts: posts.length,
+      posts,
     });
   } catch (error) {
     console.error(error);
