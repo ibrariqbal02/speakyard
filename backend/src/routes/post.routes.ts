@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createPost, deletePost, getMyPosts, getSinglePost, getUserPosts, likeUnlikePost, updatePost } from "../controllers/post.controller";
+import { archivePost, createPost, deletePost, getArchivedPosts, getMyPosts, getSinglePost, getUserPosts, likeUnlikePost, unarchivePost, updatePost } from "../controllers/post.controller";
 import isAuthenticated from "../middlewares/auth.middleware";
 import upload from "../config/multer";
 
@@ -13,6 +13,7 @@ postRoutes.post(
 );
 
 postRoutes.get("/my-posts", isAuthenticated, getMyPosts);
+postRoutes.get("/archived", isAuthenticated, getArchivedPosts);
 postRoutes.get("/user/:userId", getUserPosts);
 postRoutes.get("/:postId", getSinglePost);
 postRoutes.put(
@@ -28,5 +29,14 @@ postRoutes.delete(
   deletePost
 );
 postRoutes.put("/:postId/like", isAuthenticated, likeUnlikePost);
-
+postRoutes.put(
+  "/:postId/archive",
+  isAuthenticated,
+  archivePost
+);
+postRoutes.put(
+  "/:postId/unarchive",
+  isAuthenticated,
+  unarchivePost
+);
 export default postRoutes;
