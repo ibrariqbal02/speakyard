@@ -49,3 +49,17 @@ export const deletePost = async (postId: string) => {
   const response = await api.delete(`/post/${postId}`);
   return response.data;
 };
+
+export const archivePost = async (postId: string) => {
+  const response = await api.put(`/post/${postId}/archive`);
+  return response.data;
+};
+
+export const unarchivePost = async (postId: string) => {
+  const response = await api.put(`/post/${postId}/unarchive`);
+  return response.data;
+};
+export const getArchivedPosts = async () => {
+  const response = await api.get("/post/archived");
+  return response.data;
+};
