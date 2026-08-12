@@ -1,8 +1,4 @@
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   getMyProfile,
@@ -16,14 +12,11 @@ import {
   updatePrivacy,
 } from "../services/profile.service";
 
-
 export const useMyProfile = () => {
-
   return useQuery({
-    queryKey:["profile"],
-    queryFn:getMyProfile,
+    queryKey: ["profile"],
+    queryFn: getMyProfile,
   });
-
 };
 
 export const useUserProfile = (userId: string) => {
@@ -33,7 +26,19 @@ export const useUserProfile = (userId: string) => {
     enabled: !!userId,
   });
 };
+export const useUpdatePrivacy = () => {
+  const queryClient = useQueryClient();
 
+  return useMutation({
+    mutationFn: updatePrivacy,
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["profile"],
+      });
+    },
+  });
+};
 export const useFollowers = (userId: string) => {
   return useQuery({
     queryKey: ["followers", userId],
@@ -72,27 +77,15 @@ export const useRemoveFollower = () => {
   });
 };
 
-
-export const useUserPosts = (
-  userId:string
-) => {
-
+export const useUserPosts = (userId: string) => {
   return useQuery({
+    queryKey: ["user-posts", userId],
 
-    queryKey:[
-      "user-posts",
-      userId
-    ],
+    queryFn: () => getUserPosts(userId),
 
-    queryFn:()=>getUserPosts(userId),
-
-    enabled:!!userId,
-
+    enabled: !!userId,
   });
-
 };
-
-
 
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
@@ -117,35 +110,11 @@ export const useUpdateProfile = () => {
   });
 };
 
-
-
 export const useFollowUser = () => {
-
-  const queryClient =
-    useQueryClient();
-
-
-  return useMutation({
-
-    mutationFn:followUnfollowUser,
-
-    onSuccess:()=>{
-
-      queryClient.invalidateQueries({
-        queryKey:["profile"],
-      });
-
-    }
-
-  });
-
-};
-
-export const useUpdatePrivacy = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: updatePrivacy,
+    mutationFn: followUnfollowUser,
 
     onSuccess: () => {
       queryClient.invalidateQueries({
