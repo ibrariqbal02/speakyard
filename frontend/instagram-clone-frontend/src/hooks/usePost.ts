@@ -4,10 +4,13 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import {
+  archivePost,
   createPost,
   deletePost,
+  getArchivedPosts,
   getPostById,
   likeUnlikePost,
+  unarchivePost,
   updatePost,
 } from "../services/post.service";
 
@@ -88,5 +91,64 @@ export const useDeletePost = () => {
         queryKey: ["post", postId],
       });
     },
+  });
+};
+
+export const useArchivePost = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: archivePost,
+
+    onSuccess: (_, postId) => {
+      queryClient.invalidateQueries({
+        queryKey: ["feed"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["user-posts"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["my-posts"],
+      });
+
+      queryClient.removeQueries({
+        queryKey: ["post", postId],
+      });
+    },
+  });
+};
+
+export const useUnarchivePost = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: unarchivePost,
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["feed"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["user-posts"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["my-posts"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["archived-posts"],
+      });
+    },
+  });
+};
+
+export const useArchivedPosts = () => {
+  return useQuery({
+    queryKey: ["archived-posts"],
+    queryFn: getArchivedPosts,
   });
 };
