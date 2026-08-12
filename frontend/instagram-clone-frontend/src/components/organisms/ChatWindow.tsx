@@ -18,8 +18,6 @@ const ChatWindow = ({ conversationId }: Props) => {
   const sendMessage = useSendMessage();
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Derive the other participant's info from the already-cached conversations list
-  // so we get name + avatar without an extra request
   const queryClient = useQueryClient();
   const conversationsCache = queryClient.getQueryData<any>(["conversations"]);
   const conversation = conversationsCache?.conversations?.find(

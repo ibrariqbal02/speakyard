@@ -15,7 +15,7 @@ export const useConversations = () =>
   useQuery({
     queryKey: ["conversations"],
     queryFn: getConversations,
-    refetchInterval: 5000, // poll every 5 s so the list stays fresh
+    refetchInterval: 5000, 
   });
 
 export const useMessages = (

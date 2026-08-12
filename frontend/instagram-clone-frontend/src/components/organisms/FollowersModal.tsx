@@ -43,6 +43,10 @@ const FollowersModal = ({ userId, onClose }: Props) => {
           {followers.map((u: any) => {
             const isMe = u._id === myId;
             const isFollowing = myFollowing.some((id: string) => id === u._id);
+            const isFollowRowLoading =
+              followUser.isPending && followUser.variables === u._id;
+            const isRemoveRowLoading =
+              removeFollower.isPending && removeFollower.variables === u._id;
 
             return (
               <div key={u._id} className="flex items-center justify-between gap-3">
@@ -62,22 +66,22 @@ const FollowersModal = ({ userId, onClose }: Props) => {
                   {!isMe && (
                     <button
                       onClick={() => followUser.mutate(u._id)}
-                      disabled={followUser.isPending}
-                      className={`px-4 py-2 rounded-lg text-sm text-white ${
+                      disabled={isFollowRowLoading}
+                      className={`px-4 py-2 rounded-lg text-sm text-white disabled:opacity-60 ${
                         isFollowing ? "bg-gray-600" : "bg-blue-600"
                       }`}
                     >
-                      {isFollowing ? "Following" : "Follow"}
+                      {isFollowRowLoading ? "Loading..." : isFollowing ? "Following" : "Follow"}
                     </button>
                   )}
 
                   {isMyProfile && !isMe && (
                     <button
                       onClick={() => removeFollower.mutate(u._id)}
-                      disabled={removeFollower.isPending}
-                      className="px-4 py-2 rounded-lg text-sm border"
+                      disabled={isRemoveRowLoading}
+                      className="px-4 py-2 rounded-lg text-sm border disabled:opacity-60"
                     >
-                      Remove
+                      {isRemoveRowLoading ? "Loading..." : "Remove"}
                     </button>
                   )}
                 </div>

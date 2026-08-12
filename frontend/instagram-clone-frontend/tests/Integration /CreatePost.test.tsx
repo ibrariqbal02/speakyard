@@ -71,9 +71,7 @@ describe("CreatePost Component", () => {
     return new File(["dummy content"], name, { type });
   };
 
-  /* ==========================================
-     1. Initial Empty State / Dropzone
-  ========================================== */
+
   it("renders upload dropzone correctly when no images are selected", () => {
     renderCreatePost();
 
@@ -81,14 +79,12 @@ describe("CreatePost Component", () => {
     expect(screen.getByText(/drag photos and videos here/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /select from computer/i })).toBeInTheDocument();
 
-    // Discard and Share buttons should not be present initially
+
     expect(screen.queryByRole("button", { name: /discard/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /share/i })).not.toBeInTheDocument();
   });
 
-  /* ==========================================
-     2. Image Selection & Carousel
-  ========================================== */
+
   it("displays image preview, user info, and caption textarea after selecting a file", async () => {
     renderCreatePost();
     const user = userEvent.setup();
@@ -98,7 +94,7 @@ describe("CreatePost Component", () => {
 
     await user.upload(input, file);
 
-    // Expect preview image and caption controls to render
+
     expect(screen.getByRole("img", { name: /selected 1/i })).toBeInTheDocument();
     expect(screen.getByText("johndoe")).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/write a caption\.\.\./i)).toBeInTheDocument();
@@ -121,7 +117,7 @@ describe("CreatePost Component", () => {
     );
     expect(screen.getByText("1/2 photos")).toBeInTheDocument();
 
-    // Click next slide button (chevron right icon container)
+
     const buttons = screen.getAllByRole("button");
     const nextBtn = buttons.find((btn) => btn.querySelector("svg.lucide-chevron-right"));
     
@@ -135,9 +131,7 @@ describe("CreatePost Component", () => {
     }
   });
 
-  /* ==========================================
-     3. Caption Input & Truncation
-  ========================================== */
+  
   it("updates caption and character count, truncating exceeding length", async () => {
     renderCreatePost();
     const user = userEvent.setup();
@@ -153,9 +147,7 @@ describe("CreatePost Component", () => {
     expect(screen.getByText("16/2200")).toBeInTheDocument();
   });
 
-  /* ==========================================
-     4. Discard Action
-  ========================================== */
+
   it("resets files and caption when clicking discard button", async () => {
     renderCreatePost();
     const user = userEvent.setup();
@@ -175,9 +167,7 @@ describe("CreatePost Component", () => {
     expect(screen.queryByPlaceholderText(/write a caption\.\.\./i)).not.toBeInTheDocument();
   });
 
-  /* ==========================================
-     5. Post Creation & Navigation
-  ========================================== */
+
   it("constructs FormData and navigates to '/' on successful post creation", async () => {
     mockCreatePostMutate.mockImplementation((_formData, options) => {
       options?.onSuccess?.();

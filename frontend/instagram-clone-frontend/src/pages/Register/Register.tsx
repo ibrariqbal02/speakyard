@@ -2,6 +2,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useRegister } from "../../hooks/useAuth";
 import { getErrorMessage } from "../../utils/getErrorMessage";
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 type RegisterFormData = {
   name: string;
@@ -14,7 +16,7 @@ const Register = () => {
   const navigate = useNavigate();
 
   const registerMutation = useRegister();
-
+  const [showPassword, setShowPassword] = useState(false);
   const {
     register,
     handleSubmit,
@@ -89,18 +91,30 @@ const Register = () => {
           </div>
 
           <div>
-            <input
-              type="password"
-              placeholder="Password"
-              className="w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500"
-              {...register("password", {
-                required: "Password is required",
-                minLength: {
-                  value: 8,
-                  message: "Password must be at least 8 characters",
-                },
-              })}
-            />
+            {/* Container must be relative for positioning */}
+            <div className="relative flex items-center">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                className="w-full border rounded-lg p-3 pr-10 outline-none focus:ring-2 focus:ring-blue-500"
+                {...register("password", {
+                  required: "Password is required",
+                  minLength: {
+                    value: 8,
+                    message: "Password must be at least 8 characters",
+                  },
+                })}
+              />
+
+              {/* Positioned inside the input on the right side */}
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 text-gray-500 hover:text-gray-700 focus:outline-none"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
 
             {errors.password && (
               <p className="text-red-500 text-sm mt-1">

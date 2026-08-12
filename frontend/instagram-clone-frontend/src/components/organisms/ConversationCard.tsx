@@ -36,6 +36,11 @@ const ConversationCard = ({
 
   if (!otherUser) return null;
 
+  const rawDate = conversation.lastMessage?.createdAt;
+  const parsedDate = rawDate ? new Date(rawDate) : null;
+  const lastMessageDate =
+    parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate : null;
+
   return (
     <Link
       to={`/messages/${conversation._id}`}
@@ -62,11 +67,9 @@ const ConversationCard = ({
         </p>
       </div>
 
-      {conversation.lastMessage && (
+      {lastMessageDate && (
         <span className="text-xs text-gray-400">
-          {new Date(
-            conversation.lastMessage.createdAt
-          ).toLocaleDateString()}
+          {lastMessageDate.toLocaleDateString()}
         </span>
       )}
     </Link>
