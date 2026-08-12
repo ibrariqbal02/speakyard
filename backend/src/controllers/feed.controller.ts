@@ -16,29 +16,24 @@ export const getFeed = async (
       });
     }
 
-    
     const users = [
       ...currentUser.following,
       currentUser._id,
     ];
-
-    const posts = await Post.find({
-      owner: {
-        $in: users,
-      },
-    })
-      .populate(
-        "owner",
-        "name username profilePicture"
-      )
-      .sort({ createdAt: -1 });
+const posts = await Post.find({
+  owner: {
+    $in: users,
+  },
+  status: { $ne: "archived" },
+})
+  .populate("owner", "name username profilePicture")
+  .sort({ createdAt: -1 });
 
     return res.status(200).json({
       success: true,
       totalPosts: posts.length,
       posts,
     });
-
   } catch (error) {
     console.error(error);
 
