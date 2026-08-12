@@ -51,6 +51,23 @@ export const followUnfollowUser = async (req: Request, res: Response) => {
         message: "User unfollowed successfully.",
       });
     }
+
+    currentUser.following.push(targetUser._id as typeof currentUser.following[number]);
+    targetUser.followers.push(currentUser._id as typeof targetUser.followers[number]);
+
+    await currentUser.save();
+    await targetUser.save();
+
+    await Notification.create({
+      sender: req.userId,
+      receiver: targetUser._id,
+      type: "follow",
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "User followed successfully.",
+    });
   } catch (error) {
     console.error(error);
 

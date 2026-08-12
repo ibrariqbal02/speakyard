@@ -40,6 +40,8 @@ const FollowingModal = ({ userId, onClose }: Props) => {
           {following.map((u: any) => {
             const isMe = u._id === myId;
             const iFollow = myFollowing.some((id: string) => id === u._id);
+            const isRowLoading =
+              followUser.isPending && followUser.variables === u._id;
 
             return (
               <div key={u._id} className="flex items-center justify-between gap-3">
@@ -58,12 +60,12 @@ const FollowingModal = ({ userId, onClose }: Props) => {
                 {!isMe && (
                   <button
                     onClick={() => followUser.mutate(u._id)}
-                    disabled={followUser.isPending}
-                    className={`px-4 py-2 rounded-lg text-sm text-white ${
+                    disabled={isRowLoading}
+                    className={`px-4 py-2 rounded-lg text-sm text-white disabled:opacity-60 ${
                       iFollow ? "bg-gray-600" : "bg-blue-600"
                     }`}
                   >
-                    {iFollow ? "Following" : "Follow"}
+                    {isRowLoading ? "Loading..." : iFollow ? "Following" : "Follow"}
                   </button>
                 )}
               </div>

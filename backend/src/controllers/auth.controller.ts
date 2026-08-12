@@ -49,12 +49,14 @@ export const register = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: false,
       sameSite: "lax",
+      maxAge: 15 * 60 * 1000, // 15 minutes
     });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: false,
       sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
     const userData = user.toObject();
@@ -85,8 +87,7 @@ export const login = async (req: Request, res: Response) => {
         message: "All fields are required.",
       });
     }
-    
-    
+
     const user = await User.findOne({
       $or: [{ email: login }, { username: login }],
     });
@@ -119,12 +120,14 @@ export const login = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: false,
       sameSite: "lax",
+      maxAge: 15 * 60 * 1000, // 15 minutes
     });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: false,
       sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
     const userObject = user.toObject();
@@ -137,7 +140,7 @@ export const login = async (req: Request, res: Response) => {
       user: userData,
     });
   } catch (error) {
-    console.error(error);
+    console.error("LOGIN ERROR:", error);
 
     return res.status(500).json({
       success: false,
@@ -217,6 +220,7 @@ export const refreshToken = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: false,
       sameSite: "lax",
+      maxAge: 15 * 60 * 1000, // 15 minutes
     });
 
     return res.status(200).json({
@@ -263,9 +267,6 @@ export const getUserProfile = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
 
-    // Keep followers/following as raw id arrays (not populated) — the rest of
-    // the frontend (isFollowing checks, FollowersModal/FollowingModal) compares
-    // these directly against plain user ids, same shape as getMyProfile returns.
     const user = await User.findById(userId).select("-password -refreshToken");
 
     if (!user) {
@@ -549,6 +550,54 @@ export const deleteAccount = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const updatePrivacy = async (req: Request, res: Response) => {
+  try {
+    const userId = req.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const { isPrivate } = req.body;
+
+    if (typeof isPrivate !== "boolean") {
+      return res.status(400).json({
+        success: false,
+        message: "isPrivate must be a boolean",
+      });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { isPrivate },
+      { new: true }
+    ).select("-password -refreshToken");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: isPrivate ? "Profile is now private" : "Profile is now public",
+      user,
+    });
+  } catch (error) {
+    console.error("Privacy update error:", error);
 
     return res.status(500).json({
       success: false,

@@ -14,30 +14,41 @@ import searchRouter from "./routes/search.routes";
 import notificationRourer from "./routes/notification.routes";
 import conversationRouter from "./routes/conversation.routes";
 import messageRouter from "./routes/message.routes";
-
+import cors from "cors";
 const app: Application = express();
 
-const PORT: number = Number( process.env.PORT )|| 5000;
-connectMongoose();
-
+const PORT: number = Number(process.env.PORT) || 5000;
+connectMongoose()
+app.use(
+  cors({
+    origin: "https://insagram-clone-client.vercel.app",
+    credentials: true,
+  })
+);
+app.set("trust proxy", 1);
 // middleware
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-
-
-
+// app.use(async (_req, _res, next) => {
+//   try {
+//     await connectMongoose();
+//     next();
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 //  Routes
 
-app.use("/api/auth",router)
+app.use("/api/auth", router);
 app.use("/api/post", postRoutes);
 app.use("/api/comment", commentRoutes);
 app.use("/api/follow", followRouter);
-app.use("/api/feed",feedRouter)
-app.use('/api/search',searchRouter)
-app.use('/api/notification', notificationRourer)
-app.use('/api/conversation',conversationRouter)
-app.use('/api/message',messageRouter)
+app.use("/api/feed", feedRouter);
+app.use("/api/search", searchRouter);
+app.use("/api/notification", notificationRourer);
+app.use("/api/conversation", conversationRouter);
+app.use("/api/message", messageRouter);
 
 app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
   if (err instanceof multer.MulterError) {
@@ -59,8 +70,6 @@ app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
     message: "Internal Server Error",
   });
 });
-
-
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

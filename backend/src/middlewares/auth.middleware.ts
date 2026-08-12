@@ -4,13 +4,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-
-
-const isAuthenticated = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   try {
     const token = req.cookies.accessToken;
 
@@ -38,4 +32,3 @@ const isAuthenticated = (
 };
 
 export default isAuthenticated;
-

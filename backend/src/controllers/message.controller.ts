@@ -62,12 +62,7 @@ export const sendMessage = async (req: Request, res: Response) => {
   }
 };
 
-
-
-export const getMessages = async (
-  req: Request,
-  res: Response
-) => {
+export const getMessages = async (req: Request, res: Response) => {
   try {
     const { conversationId } = req.params;
 
@@ -91,7 +86,6 @@ export const getMessages = async (
       totalMessages: messages.length,
       messages,
     });
-
   } catch (error) {
     console.error(error);
 
@@ -102,11 +96,7 @@ export const getMessages = async (
   }
 };
 
-
-export const deleteMessage = async (
-  req: Request,
-  res: Response
-) => {
+export const deleteMessage = async (req: Request, res: Response) => {
   try {
     const { messageId } = req.params;
 
@@ -146,7 +136,6 @@ export const deleteMessage = async (
       success: true,
       message: "Message deleted successfully.",
     });
-
   } catch (error) {
     console.error(error);
 

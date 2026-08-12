@@ -13,6 +13,7 @@ import {
   getFollowers,
   getFollowing,
   removeFollower,
+  updatePrivacy,
 } from "../services/profile.service";
 
 
@@ -138,4 +139,18 @@ export const useFollowUser = () => {
 
   });
 
+};
+
+export const useUpdatePrivacy = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updatePrivacy,
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["profile"],
+      });
+    },
+  });
 };

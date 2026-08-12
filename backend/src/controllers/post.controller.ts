@@ -83,7 +83,7 @@ export const getUserPosts = async (req: Request, res: Response) => {
     const { userId } = req.params;
 
     const posts = await Post.find({
-      owner: userId, // use "user" here if your schema uses user instead of owner
+      owner: userId, 
     })
       .populate("owner", "name username profilePicture")
       .sort({ createdAt: -1 });
@@ -160,9 +160,9 @@ export const updatePost = async (req: Request, res: Response) => {
       post.caption = caption;
     }
 
-    // Replace images if new images are uploaded
+    
     if (files && files.length > 0) {
-      // Delete old images
+      
       for (const image of post.images) {
         await deleteFromCloudinary(image.publicId);
       }
