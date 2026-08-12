@@ -19,7 +19,15 @@ export const updateProfile = async (data: FormData) => {
 
   return response.data;
 };
+export const updatePrivacy = async (isPrivate: boolean) => {
+  const response = await api.patch("/auth/privacy", {
 
+
+    isPrivate,
+  });
+
+  return response.data;
+};
 export const getUserPosts = async (userId: string) => {
   const response = await api.get(`/post/user/${userId}`);
 
@@ -47,10 +55,3 @@ export const removeFollower = async (userId: string) => {
   return response.data;
 };
 
-export const updatePrivacy = async (isPrivate: boolean) => {
-  const response = await api.patch("/auth/privacy", {
-    isPrivate,
-  });
-
-  return response.data;
-};
