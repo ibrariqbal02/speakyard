@@ -38,7 +38,6 @@ const EditPostModal = ({ post, onClose }: Props) => {
         formData.append("images", files[i]);
       }
     }
-
     updatePost.mutate(
       { postId: post._id, formData },
       {
