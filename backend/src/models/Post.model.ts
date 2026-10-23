@@ -27,6 +27,17 @@ const postSchema = new Schema(
       },
     ],
 
+    video: {
+      url: {
+        type: String,
+        default: null,
+      },
+      publicId: {
+        type: String,
+        default: null,
+      },
+    },
+
     likes: [
       {
         type: Types.ObjectId,
@@ -34,15 +45,18 @@ const postSchema = new Schema(
       },
     ],
 
-    isArchived: {
-      type: Boolean,
-      default: false,
+    status: {
+      type: String,
+      enum: ["active", "archived"],
+      default: "active",
     },
   },
   {
     timestamps: true,
   }
 );
+
+
 
 const Post = model("Post", postSchema);
 

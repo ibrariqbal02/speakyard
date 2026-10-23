@@ -1,50 +1,87 @@
-import { Send } from "lucide-react";
-import { useState } from "react";
+import { Mic, Send } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import VoiceRecorder from "./VoiceRecorder";
 
 type Props = {
   onSend: (text: string) => void;
+  onSendVoice: (blob: Blob) => void;
   loading: boolean;
+  voiceLoading: boolean;
 };
 
-const MessageInput = ({
-  onSend,
-  loading,
-}: Props) => {
+const MessageInput = ({ onSend, onSendVoice, loading, voiceLoading }: Props) => {
   const [text, setText] = useState("");
+  const [showRecorder, setShowRecorder] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!showRecorder) inputRef.current?.focus();
+  }, [showRecorder]);
 
   const handleSend = () => {
-    if (!text.trim()) return;
-
-    onSend(text);
-
+    const trimmed = text.trim();
+    if (!trimmed || loading) return;
+    onSend(trimmed);
     setText("");
+    inputRef.current?.focus();
   };
 
+  const handleVoiceSend = (blob: Blob) => {
+    onSendVoice(blob);
+    setShowRecorder(false);
+  };
+
+  // While the recorder is open, render it in place of the normal input bar
+  if (showRecorder) {
+    return (
+      <VoiceRecorder
+        onSend={handleVoiceSend}
+        onCancel={() => setShowRecorder(false)}
+        loading={voiceLoading}
+      />
+    );
+  }
+
   return (
-    <div className="border-t bg-white p-4 flex gap-3">
+    <div
+      className="border-t border-gray-200 bg-white px-3 py-2.5 flex items-center gap-2.5 shrink-0"
+      style={{ paddingBottom: "max(10px, env(safe-area-inset-bottom, 10px))" }}
+    >
+      {/* Mic button — opens voice recorder */}
+      <button
+        onClick={() => setShowRecorder(true)}
+        title="Record voice message"
+        className="shrink-0 rounded-full p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition"
+      >
+        <Mic size={18} />
+      </button>
 
       <input
+        ref={inputRef}
         value={text}
-        onChange={(e) =>
-          setText(e.target.value)
-        }
+        onChange={(e) => setText(e.target.value)}
         onKeyDown={(e) => {
-          if (e.key === "Enter") {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
             handleSend();
           }
         }}
-        placeholder="Type a message..."
-        className="flex-1 rounded-full border px-4 py-3 outline-none"
+        placeholder="Message..."
+        disabled={loading}
+        className="flex-1 rounded-full border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm outline-none focus:border-gray-400 focus:bg-white transition disabled:opacity-50"
       />
 
       <button
         onClick={handleSend}
-        disabled={loading}
-        className="rounded-full bg-blue-600 p-3 text-white"
+        disabled={!text.trim() || loading}
+        className={`shrink-0 rounded-full p-2.5 transition ${
+          text.trim() && !loading
+            ? "bg-blue-500 hover:bg-blue-600 text-white"
+            : "bg-gray-100 text-gray-400 cursor-not-allowed"
+        }`}
       >
-        <Send size={20} />
+        <Send size={18} />
       </button>
-
     </div>
   );
 };
