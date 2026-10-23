@@ -116,7 +116,7 @@ const Sidebar = () => {
               </svg>
             ) : (
               <span className="font-logo text-3xl leading-none select-none">
-                SpeakYard
+                Instagram
               </span>
             )}
           </div>
