@@ -51,7 +51,7 @@ describe("Register Component", () => {
   it("renders all form elements, heading, and login link correctly", () => {
     renderRegister();
 
-    expect(screen.getByRole("heading", { name: /instagram/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /speakyard/i })).toBeInTheDocument();
     expect(screen.getByText(/sign up to see photos from your friends/i)).toBeInTheDocument();
 
     expect(screen.getByPlaceholderText(/full name/i)).toBeInTheDocument();
