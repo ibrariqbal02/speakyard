@@ -46,7 +46,7 @@ describe("Login Component", () => {
   it("renders heading, login form fields, buttons, and routing links", () => {
     renderLogin();
 
-    expect(screen.getByRole("heading", { name: /speakyard/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /instagram/i })).toBeInTheDocument();
     expect(screen.getByText(/login to your account/i)).toBeInTheDocument();
 
     expect(screen.getByPlaceholderText(/email or username/i)).toBeInTheDocument();

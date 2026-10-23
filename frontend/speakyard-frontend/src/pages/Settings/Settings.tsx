@@ -174,10 +174,10 @@ const Settings = () => {
       <div className="bg-white dark:bg-black min-h-full">
         <SectionHeader title="About" onBack={() => setSection("main")} />
         <div className="px-4 py-6 space-y-2 text-sm text-gray-600 dark:text-neutral-300">
-          <p><span className="font-semibold">App:</span> SpeakYard</p>
+          <p><span className="font-semibold">App:</span> Instagram Clone</p>
           <p><span className="font-semibold">Version:</span> 1.0.0</p>
           <p className="text-gray-400 dark:text-neutral-500 text-xs mt-4">
-            This is a demo project for language practice.
+            This is a demo project and is not affiliated with Instagram or Meta.
           </p>
         </div>
       </div>
