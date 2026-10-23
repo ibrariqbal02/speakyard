@@ -41,7 +41,7 @@ const Login = () => {
 
         {/* Wordmark */}
         <h1 className="font-logo text-[44px] leading-none mb-8 select-none text-gray-900">
-          SpeakYard
+          Instagram
         </h1>
 
         {/* Form */}

@@ -35,7 +35,7 @@ const Register = () => {
 
         {/* Wordmark */}
         <h1 className="font-logo text-[44px] leading-none mb-3 select-none text-gray-900">
-          SpeakYard
+          Instagram
         </h1>
 
         <p className="text-base font-semibold text-gray-400 text-center mb-5 leading-snug">

@@ -38,7 +38,7 @@ const Home = () => {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center px-6">
         <div className="text-5xl mb-4">📸</div>
-        <h2 className="text-lg font-semibold mb-1">Welcome to SpeakYard</h2>
+        <h2 className="text-lg font-semibold mb-1">Welcome to Instagram</h2>
         <p className="text-gray-500 text-sm mb-4">
           Follow people to see their photos and videos here.
         </p>
