@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Heart } from "lucide-react";
 
+import Avatar from "../atoms/Avatar";
+
 import {
   useCreateComment,
   useDeleteComment,
@@ -86,10 +88,10 @@ const CommentCard = ({
 
   return (
     <div className="flex items-start gap-3">
-      <img
+      <Avatar
         src={comment.owner?.profilePicture}
-        alt={comment.owner?.name}
-        className={`rounded-full object-cover ${isReply ? "w-7 h-7" : "w-9 h-9"}`}
+        name={comment.owner?.name}
+        size={isReply ? 7 : 9}
       />
 
       <div className="flex-1 min-w-0">

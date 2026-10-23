@@ -14,6 +14,8 @@ import {
   updatePrivacy,
 } from "../controllers/auth.controller";
 import isAuthenticated from "../middlewares/auth.middleware";
+import { optionalAuth } from "../middlewares/auth.middleware";
+import upload from "../config/multer";
 
 const router = Router();
 
@@ -26,14 +28,12 @@ router.post("/logout", isAuthenticated, logout);
 router.post("/refresh-token", refreshToken);
 
 router.get("/me", isAuthenticated, getMyProfile);
-router.get("/profile/:userId", getUserProfile);
-router.put("/update-profile", isAuthenticated, updateProfile);
+router.get("/profile/:userId", optionalAuth, getUserProfile);
+router.put("/update-profile", isAuthenticated, upload.single("profilePicture"), updateProfile);
 router.patch("/change-password", isAuthenticated, changePassword);
 router.patch("/privacy", isAuthenticated, updatePrivacy);
 router.post("/forgot-password", forgotPassword);
 router.patch("/reset-password", resetPassword);
 router.delete("/delete-account", isAuthenticated, deleteAccount);
-
-// updatePrivacy
 
 export default router;

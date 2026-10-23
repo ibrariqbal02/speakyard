@@ -6,13 +6,14 @@ import {
   generateRefreshToken,
 } from "../utils/generateToken";
 import jwt from "jsonwebtoken";
-import uploadToCloud from "../utils/uploadToCloudinary";
+// import uploadToCloud from "../utils/uploadToCloudinary";
 import crypto from "crypto";
 import sendEmail from "../utils/sendEmail";
 import Post from "../models/Post.model";
 import Comment from "../models/Comment.model";
 import Notification from "../models/Notification.model";
 import deleteFromCloudinary from "../utils/deleteFromCloudinary";
+import uploadToCloudinary from "../utils/uploadToCloudinary";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -47,15 +48,15 @@ export const register = async (req: Request, res: Response) => {
     await user.save();
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure:true,
+      sameSite: "none",
       maxAge: 15 * 60 * 1000, // 15 minutes
     });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: true,
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -118,15 +119,15 @@ export const login = async (req: Request, res: Response) => {
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: true,
+      sameSite: "none",
       maxAge: 15 * 60 * 1000, // 15 minutes
     });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: true,
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -276,8 +277,35 @@ export const getUserProfile = async (req: Request, res: Response) => {
       });
     }
 
+    // Determine who is asking (token is optional on this route)
+    const viewerId = (req as any).userId as string | undefined;
+    const isOwner = viewerId && viewerId === userId;
+    const isFollower =
+      viewerId &&
+      user.followers.some((id) => id.toString() === viewerId);
+    const canSeeDetails = isOwner || isFollower || !user.isPrivate;
+
+    if (!canSeeDetails) {
+      // Return a stripped-down profile so the frontend can render the "private" state
+      return res.status(200).json({
+        success: true,
+        isPrivate: true,
+        user: {
+          _id: user._id,
+          name: user.name,
+          username: user.username,
+          profilePicture: user.profilePicture,
+          bio: "",
+          isPrivate: true,
+          followers: user.followers,   // counts are still public on Instagram; keep array for count
+          following: user.following,
+        },
+      });
+    }
+
     return res.status(200).json({
       success: true,
+      isPrivate: false,
       user,
     });
   } catch (error) {
@@ -290,6 +318,62 @@ export const getUserProfile = async (req: Request, res: Response) => {
   }
 };
 
+// export const updateProfile = async (req: Request, res: Response) => {
+//   try {
+//     const { name, username, bio } = req.body;
+
+//     const user = await User.findById(req.userId);
+
+//     if (!user) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "User not found.",
+//       });
+//     }
+
+//     if (username && username !== user.username) {
+//       const usernameExists = await User.findOne({ username });
+
+//       if (usernameExists) {
+//         return res.status(400).json({
+//           success: false,
+//           message: "Username already exists.",
+//         });
+//       }
+
+//       user.username = username;
+//     }
+
+//     if (name) user.name = name;
+
+//     if (bio) user.bio = bio;
+
+//     if (req.file) {
+//       const result = await uploadToCloud(req.file.path);
+
+//       user.profilePicture = result.secure_url;
+//     }
+
+//     await user.save();
+
+//     const updatedUser = await User.findById(user._id).select(
+//       "-password -refreshToken"
+//     );
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Profile updated successfully.",
+//       user: updatedUser,
+//     });
+//   } catch (error) {
+//     console.error(error);
+
+//     return res.status(500).json({
+//       success: false,
+//       message: "Internal Server Error",
+//     });
+//   }
+// };
 export const updateProfile = async (req: Request, res: Response) => {
   try {
     const { name, username, bio } = req.body;
@@ -321,7 +405,10 @@ export const updateProfile = async (req: Request, res: Response) => {
     if (bio) user.bio = bio;
 
     if (req.file) {
-      const result = await uploadToCloud(req.file.path);
+      const result = await uploadToCloudinary(
+        req.file.buffer,
+        "profiles"
+      );
 
       user.profilePicture = result.secure_url;
     }
@@ -342,11 +429,13 @@ export const updateProfile = async (req: Request, res: Response) => {
 
     return res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Internal Server Error",
     });
   }
 };
-
 export const changePassword = async (req: Request, res: Response) => {
   try {
     const { currentPassword, newPassword } = req.body;

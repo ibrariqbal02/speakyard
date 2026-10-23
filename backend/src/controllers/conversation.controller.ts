@@ -20,9 +20,7 @@ export const createConversation = async (req: Request, res: Response) => {
     }
 
     let conversation = await Conversation.findOne({
-      participants: {
-        $all: [req.userId, receiverId],
-      },
+      participants: { $all: [req.userId, receiverId] },
     });
 
     if (!conversation) {
@@ -37,7 +35,51 @@ export const createConversation = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
 
+export const createGroupConversation = async (req: Request, res: Response) => {
+  try {
+    const { participantIds, groupName } = req.body;
+
+    if (!Array.isArray(participantIds) || participantIds.length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: "A group chat requires at least 2 other participants.",
+      });
+    }
+
+    if (!groupName?.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Group name is required.",
+      });
+    }
+
+    // De-duplicate and always include the creator
+    const members = [...new Set([req.userId, ...participantIds])];
+
+    const conversation = await Conversation.create({
+      participants: members,
+      isGroup: true,
+      groupName: groupName.trim(),
+    });
+
+    const populated = await conversation.populate(
+      "participants",
+      "name username profilePicture"
+    );
+
+    return res.status(201).json({
+      success: true,
+      conversation: populated,
+    });
+  } catch (error) {
+    console.error(error);
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -61,7 +103,6 @@ export const getMyConversations = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error(error);
-
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",

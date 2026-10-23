@@ -1,26 +1,25 @@
 import { Router } from "express";
 import isAuthenticated from "../middlewares/auth.middleware";
-import { deleteMessage, getMessages, sendMessage } from "../controllers/message.controller";
+import {
+  deleteMessage,
+  editMessage,
+  getMessages,
+  sendMessage,
+  sendVoiceMessage,
+} from "../controllers/message.controller";
+import uploadAudio from "../config/multerAudio";
 
+const messageRouter = Router();
 
-
-
-const messageRouter = Router()
+messageRouter.post("/:conversationId", isAuthenticated, sendMessage);
 messageRouter.post(
-  "/:conversationId",
+  "/:conversationId/voice",
   isAuthenticated,
-  sendMessage
+  uploadAudio.single("audio"),
+  sendVoiceMessage
 );
+messageRouter.get("/:conversationId", isAuthenticated, getMessages);
+messageRouter.patch("/:messageId", isAuthenticated, editMessage);
+messageRouter.delete("/:messageId", isAuthenticated, deleteMessage);
 
-messageRouter.get(
-  "/:conversationId",
-  isAuthenticated,
-  getMessages
-);
-
-messageRouter.delete(
-  "/:messageId",
-  isAuthenticated,
-  deleteMessage
-);
-export default messageRouter
+export default messageRouter;

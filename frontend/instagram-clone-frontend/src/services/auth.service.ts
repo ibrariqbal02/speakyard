@@ -75,3 +75,8 @@ export const deleteAccount = async () => {
   return response.data;
 };
 
+export const updatePrivacy = async (isPrivate: boolean) => {
+  const response = await api.patch("/auth/privacy", { isPrivate });
+  return response.data;
+};
+

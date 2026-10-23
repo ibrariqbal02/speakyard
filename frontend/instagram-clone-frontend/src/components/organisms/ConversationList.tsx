@@ -24,7 +24,7 @@ const ConversationList = ({
   const currentUserId = profile?.user?._id;
 
   return (
-    <div className="h-full overflow-y-auto">
+    <div className="flex-1 min-h-0 overflow-y-auto">
 
       {data?.conversations?.length === 0 && (
         <p className="text-center py-10 text-gray-500">

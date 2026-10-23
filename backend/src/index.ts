@@ -18,10 +18,22 @@ import cors from "cors";
 const app: Application = express();
 
 const PORT: number = Number(process.env.PORT) || 5000;
-connectMongoose()
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://insagram-clone-client.vercel.app",
+  "https://instagram-clone-client.vercel.app",
+];
+
 app.use(
   cors({
-    origin: "https://insagram-clone-client.vercel.app",
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g. mobile apps, curl, Postman)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
     credentials: true,
   })
 );
@@ -30,14 +42,6 @@ app.set("trust proxy", 1);
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-// app.use(async (_req, _res, next) => {
-//   try {
-//     await connectMongoose();
-//     next();
-//   } catch (error) {
-//     next(error);
-//   }
-// });
 //  Routes
 
 app.use("/api/auth", router);
@@ -71,6 +75,13 @@ app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+connectMongoose()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to connect to MongoDB, server not started:", err.message);
+    process.exit(1);
+  });
