@@ -1,0 +1,20 @@
+# OS / editor
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Env files (commit only .env.example)
+.env
+.env.*
+!.env.example
+
+# Local assistant instructions (each developer keeps their own; see docs/DEVELOPMENT.md)
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+
+# Dependencies and builds
+node_modules/
+dist/
+coverage/
