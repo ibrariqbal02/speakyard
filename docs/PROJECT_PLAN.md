@@ -20,10 +20,15 @@ Posts, reels and other Instagram features are hidden from the MVP navigation (co
 | 2026-10-23 | Mobile approach: wrap the existing React client with **Capacitor** (one codebase) |
 | 2026-10-23 | Hosting: client on Vercel, server on Render/Railway/Fly (needs always-on server for sockets), MongoDB Atlas, Cloudinary |
 | 2026-10-23 | Name confirmed: **Speakyard** (owner still to check domain, Play Store, trademark) |
-| 2026-10-23 | Work branch in both repos: `claude/tender-curie-l8kmyp` |
+| 2026-10-24 | Single repo: **github.com/ibrariqbal02/speakyard** (`backend/`, `frontend/speakyard-frontend/`, `mobile/`). Old split repos are retired |
+| 2026-10-24 | Branches: `feature/*` → PR → `release-dev` (staging) → PR after testing → `release-prod-sp` (production). `mobile` branch for the mobile app. See docs/DEVELOPMENT.md |
+| 2026-10-24 | No AI-tool names, co-author lines or session links in commits, PRs or files. Repo set to private |
+| 2026-10-24 | Admin panel for the owner: admin role granted by email (`ADMIN_EMAILS` env), opens `/admin` |
+| 2026-10-24 | Calls must be HD (720p+ with simulcast, adaptive) with clear audio (echo cancellation, noise suppression) |
+| 2026-10-24 | English is the only learning language until launch (data model stays multi-language) |
 | 2026-10-23 | MVP focus: **human practice calls** (1-to-1 voice, video later) + **AI practice partner** for new users. Posts/reels hidden for now |
 | 2026-10-23 | Calls: WebRTC through a managed service (**LiveKit Cloud** first choice, Agora as backup); server issues room tokens. Socket.IO for matching, presence and call invites |
-| 2026-10-23 | AI partner: speech-to-text → Claude (conversation + corrections) → text-to-speech. Free daily AI minutes limit to control cost |
+| 2026-10-23 | AI partner: speech-to-text → LLM via Anthropic API (conversation + corrections) → text-to-speech. Free daily AI minutes limit to control cost |
 | 2026-10-24 | Domain bought: **speakyard.net** (registered via Wix; use Wix only for DNS, not as the website). Web app: speakyard.net (Vercel), API: api.speakyard.net (Render). Same site, so cookies can use SameSite=Lax |
 | 2026-10-24 | MVP scope: real-time chat + 1-to-1 audio/video calls + group calls + AI calls; remove all Instagram branding |
 
@@ -45,7 +50,7 @@ Chatterbox, Chatterbug, Speaky, Talkpal.
 
 | Phase | Work | Status |
 |---|---|---|
-| 0 | New name, branding, rename repos | Name confirmed; branding and repo rename to do |
+| 0 | New name, branding, single repo, branch flow | Done (2026-10-24) |
 | 1 | Production hardening (details below) | In progress (1.1–1.10 done) |
 | 2 | MVP: chat, audio/video/group calls, AI calls (details below) | Not started |
 | 3 | Capacitor Android build + push notifications (FCM) | Not started |
@@ -125,11 +130,17 @@ Phase 1 priority order for the MVP: 1.11–1.13 (sockets, needed for calls) → 
 - [ ] 2.15 Presence: online partners list, "available to talk" toggle
 
 ### 2C AI calls (practice partner, first thing a new user does)
-- [ ] 2.4 Server `ai` module: Claude API tutor, per-language and level-aware prompt, short replies, gentle corrections
-- [ ] 2.5 AI call screen like a phone call: speak → speech-to-text → Claude → text-to-speech → play (push-to-talk first)
+- [ ] 2.4 Server `ai` module: LLM tutor (Anthropic API), per-language and level-aware prompt, short replies, gentle corrections
+- [ ] 2.5 AI call screen like a phone call: speak → speech-to-text → LLM → text-to-speech → play (push-to-talk first)
 - [ ] 2.6 Topics/scenarios (introduce yourself, ordering food, job interview, travel)
 - [ ] 2.7 End-of-call feedback: mistakes, better phrases, new words, simple score
 - [ ] 2.8 Free daily AI minutes limit, usage tracking per user
+
+### 2E Admin panel (owner only)
+- [ ] 2.18 Admin role: `role` field on User; emails in `ADMIN_EMAILS` become admin on login; `requireAdmin` middleware; admin actions logged
+- [ ] 2.19 `/admin` dashboard: totals (users, online now, new today, messages, calls, call minutes), charts for last 30 days
+- [ ] 2.20 Users: search, view profile, ban/unban, delete; Reports queue (reported users/messages/calls) with actions
+- [ ] 2.21 Calls and conversations overview: live calls now, call history, durations. Private message text is shown only for reported messages
 
 ### 2D Keep users coming back
 - [ ] 2.16 Streaks and XP for AI calls and human calls, daily speaking goal
@@ -185,17 +196,11 @@ Order of work: see `docs/COMMANDS.md`.
     coverage for this work lives in `tests/Integration /useSocket.test.ts` (hooks, mocking
     `src/lib/socket.ts`) and the backend's `tests/unit/socket.test.ts` +
     `tests/integration/socket.test.ts` (real Socket.IO server + `socket.io-client`, real DB).
-- 2026-10-24: Monorepo note — github.com/ibrariqbal02/speakyard (backend/ + frontend/speakyard-frontend/)
-  was a stale pre-hardening snapshot; synced it to a `claude/tender-curie-l8kmyp` branch there with the
-  full current state through 1.13 (full replace, not merged to its `main`). The split repos
-  (insagram-clone-server / insagram-clone-client) remain the ones this plan and CLAUDE.md files track.
-  The frontend's working folder is now `speakyard-frontend/` (renamed from `instagram-clone-frontend/`)
-  to match that monorepo's naming; `frontend/CLAUDE.md` and this file were updated to match, but
-  `backend/CLAUDE.md`'s note about the client's folder name is still stale (one line, not fixed yet).
+- 2026-10-24: The speakyard monorepo was synced with the split repos' current state (through 1.13).
 - 2026-10-24: Domain speakyard.net bought. Scope now includes video and group calls and rebrand (2.0). Added docs/COMMANDS.md with the ordered commands.
 - 2026-10-24: Phase 2.1–2.2 done, 2.3 built but **diverges from the plan text above** — this session
   started from "do 2.1-2.3" against the plan as it read *before* the domain/rebrand/COMMANDS.md commit
-  landed (same day, different session — COMMANDS.md's own "only one Claude session on the branch at a
+  landed (same day, different session — COMMANDS.md's own "only one session on the branch at a
   time" rule wasn't followed here). Flagging rather than silently reconciling:
   - Server: `User.model.ts` gained `nativeLanguages` ([String]), `learningLanguages`
     ([{ code, level: A1-C2 }]), `country`, `interests` ([String]), `birthYear` (number, nullable),
@@ -233,3 +238,4 @@ Order of work: see `docs/COMMANDS.md`.
     `ProtectedRoute.test.tsx` cases for the onboarding redirect, and an `authApi.test.ts` case for
     `completeOnboarding`. No new regressions: same pre-existing 6 backend / 11 frontend failing suites
     as before this change (confirmed by re-running the full suite before and after).
+- 2026-10-24: Moved to the single speakyard repo with release-dev / release-prod-sp / mobile branches. Synced onboarding work (2.1–2.3). Added admin panel steps (2.18–2.21), HD call and English-only decisions.

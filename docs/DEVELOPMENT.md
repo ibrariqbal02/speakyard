@@ -51,11 +51,3 @@ Frontend (`frontend/speakyard-frontend/`):
   `src/utils/authTokens.ts` (cookies, token hashing, mobile tokens via `X-Client-Platform: mobile`)
 - Frontend: `src/api/axios.ts` (API client, token refresh) · `src/lib/socket.ts` · `src/hooks/` · `src/services/` ·
   `src/pages/` · `src/components/`
-
-## Using a coding assistant locally
-
-`CLAUDE.md` is git-ignored. To give a local assistant these rules, create `CLAUDE.md` in the repo root with one line:
-
-```
-@docs/DEVELOPMENT.md
-```
